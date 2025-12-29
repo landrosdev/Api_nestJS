@@ -1,0 +1,25 @@
+Exemple :
+{
+  "title": "Faire les courses",
+  "description": "Acheter du lait, des œufs et du pain"
+}
+
+{
+  "title": "Envoyer email au client",
+  "description": "Relancer le client pour la facture"
+}
+{
+  "title": "Préparer la réunion",
+  "description": "Créer l'ordre du jour et envoyer les invitations"
+}
+
+Sans description :
+{
+  "title": "Faire les courses"
+}
+{
+  "title": "Envoyer email au client"
+}
+{
+  "title": "Préparer la réunion"
+}

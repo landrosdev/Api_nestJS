@@ -1,62 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../database/db.client';
+
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
-    
-    // Sample in-memory tasks data
-    private tasks = [
-        { id: 1, title: 'Apprendre NestJS', completed: false },
-        { id: 2, title: 'Créer un premier endpoint', completed: true },
-    ];
+  constructor(private prisma: PrismaService) {}
 
-    // Logique pour récupérer toutes les tâches
-    getAllTasks() {
-        return this.tasks;
-    }
-
-    // Logique pour créer une nouvelle tâche
-    createTask(title: string) {
-    const newTask = {
-      id: this.tasks.length + 1,
-      title,
-      completed: false,
-    };
-    this.tasks.push(newTask);
-    return newTask;
+  async create(dto: CreateTaskDto) {
+    return this.prisma.task.create({ data: dto });
   }
 
-    // logique pour marquer une tâche comme complétée
-    completeTask(id: number) {
-    const task = this.tasks.find(t => t.id === id);
-        if (!task) {
-            return { message: 'Tâche non trouvée' };
-        }
-        task.completed = true;
-        return task;
-    }
+  async findAll() {
+    return this.prisma.task.findMany();
+  }
 
-    // Logique pour mettre à jour une tache 
-    updateTask(id: number, updateData: Partial<{ title: string }>) {
-    const task = this.tasks.find(t => t.id === id);
-
-    if (!task) {
-        return { message: 'Tâche non trouvée' };
-    }
-
-    Object.assign(task, updateData);
+  async findOne(id: number) {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+    if (!task) throw new NotFoundException('Task not found');
     return task;
-    }
+  }
 
+  async update(id: number, dto: UpdateTaskDto) {
+    await this.findOne(id); // vérifie si existe
+    return this.prisma.task.update({ where: { id }, data: dto });
+  }
 
-    // Logique pour supprimer une tache 
-    deleteTask(id: number) {
-    const index = this.tasks.findIndex(t => t.id === id);
-    if (index === -1) {
-        return { message: 'Tâche non trouvée' };
-    }
-    const deleted = this.tasks.splice(index, 1);
-    return { message: 'Tâche supprimée', task: deleted[0] };
-    }
-
-
+  async remove(id: number) {
+    await this.findOne(id); // vérifie si existe
+    return this.prisma.task.delete({ where: { id } });
+  }
 }
